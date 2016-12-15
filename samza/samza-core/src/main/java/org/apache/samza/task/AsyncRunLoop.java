@@ -403,7 +403,7 @@ public class AsyncRunLoop implements Runnable, Throttleable {
      */
     private void process() {
       final IncomingMessageEnvelope envelope = state.fetchEnvelope();
-      log.trace("Process ssp {} offset {}", envelope.getSystemStreamPartition(), envelope.getOffset());
+      log.info("Process ssp {} offset {}", envelope.getSystemStreamPartition(), envelope.getOffset());
 
       final ReadableCoordinator coordinator = new ReadableCoordinator(task.taskName());
       TaskCallbackFactory callbackFactory = new TaskCallbackFactory() {

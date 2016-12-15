@@ -88,6 +88,7 @@ class RunLoop (
 
       window
       commit
+
       val totalNs = clock() - loopStartTime
       metrics.utilization.set(activeNs.toFloat / totalNs)
       activeNs = 0L
@@ -113,7 +114,7 @@ class RunLoop (
       if (envelope != null) {
         val ssp = envelope.getSystemStreamPartition
 
-        trace("Processing incoming message envelope for SSP %s." format ssp)
+        info("Processing incoming message envelope for SSP %s." format ssp)
         metrics.envelopes.inc
 
         val taskInstances = systemStreamPartitionToTaskInstances(ssp)
@@ -125,6 +126,8 @@ class RunLoop (
             coordinatorRequests.update(coordinator)
           }
         }
+        // only commit if there is one incoming msg
+        commit_per_process
       } else {
         trace("No incoming message envelope was available.")
         metrics.nullEnvelopes.inc
@@ -173,5 +176,15 @@ class RunLoop (
       shutdownNow |= coordinatorRequests.shouldShutdownNow
       coordinatorRequests.commitRequests.clear()
     })
+  }
+
+  /**
+   * (Capstone) commit for each msg.
+   *
+   */
+  private def commit_per_process {
+    info("Committing for each processed msg.")
+    metrics.commits.inc
+    taskInstances.values.foreach(_.commit)
   }
 }

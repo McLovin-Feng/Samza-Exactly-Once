@@ -151,7 +151,7 @@ class TaskInstance[T](
     if (ssp2catchedupMapping(envelope.getSystemStreamPartition)) {
       metrics.messagesActuallyProcessed.inc
 
-      trace("Processing incoming message envelope for taskName and SSP: %s, %s" format (taskName, envelope.getSystemStreamPartition))
+      info("Processing incoming message envelope for taskName and SSP: %s, %s" format (taskName, envelope.getSystemStreamPartition))
 
       if (isAsyncTask) {
         exceptionHandler.maybeHandle {
@@ -163,12 +163,10 @@ class TaskInstance[T](
          task.asInstanceOf[StreamTask].process(envelope, collector, coordinator)
         }
 
-        trace("Updating offset map for taskName, SSP and offset: %s, %s, %s" format (taskName, envelope.getSystemStreamPartition, envelope.getOffset))
+        info("Updating offset map for taskName, SSP and offset: %s, %s, %s" format (taskName, envelope.getSystemStreamPartition, envelope.getOffset))
 
         offsetManager.update(taskName, envelope.getSystemStreamPartition, envelope.getOffset)
 
-        // CapStone
-        commit
       }
     }
   }
@@ -202,11 +200,11 @@ class TaskInstance[T](
       storageManager.flush
     }
 
-    trace("Flushing producers for taskName: %s" format taskName)
+    info("Flushing producers for taskName: %s" format taskName)
 
     collector.flush
 
-    trace("Committing offset manager for taskName: %s" format taskName)
+    info("Committing offset manager for taskName: %s" format taskName)
 
     offsetManager.checkpoint(taskName)
   }

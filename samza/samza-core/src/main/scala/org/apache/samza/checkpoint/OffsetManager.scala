@@ -225,7 +225,11 @@ class OffsetManager(
         }
       }
 
-      checkpointManager.writeCheckpoint(taskName, new Checkpoint(partitionOffsets))
+      val checkpoint = new Checkpoint(partitionOffsets)
+
+      info("writing checkpoint: " + checkpoint);
+
+      checkpointManager.writeCheckpoint(taskName, checkpoint)
       Option(lastProcessedOffsets.get(taskName)) match {
         case Some(sspToOffsets) => sspToOffsets.foreach { case (ssp, checkpoint) => offsetManagerMetrics.checkpointedOffsets(ssp).set(checkpoint) }
         case None =>
